@@ -4,8 +4,9 @@
 ###
 
 :option_two
-kernel https://boot.netboot.xyz/memdisk raw iso
-initrd http://ftp.vim.org/ftp/os/Linux/distr/porteus/x86_64/Porteus-v5.0/Porteus-KDE-v5.0rc1-x86_64.iso
+set url http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/
+kernel ${url}linux
+initrd ${url}initrd.gz
 boot || goto custom_exit
 
 :custom_exit
