@@ -4,11 +4,10 @@
 ###
 
 :option_two
-set url http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/
+set url http://archive.ubuntu.com/ubuntu/dists/focal/main/installer-amd64/current/legacy-images/netboot/ubuntu-installer/amd64/
 kernel ${url}linux
 initrd ${url}initrd.gz
-imgargs vmlinuz root=/dev/nfs boot=bionic netboot=nfs nfsroot=${nfs-server}:${nfs-root}${base-url} locale=en_US.UTF-8 proto=tcp keyboard-configuration/layoutcode=no mirror/country=NO
-shell
+imgargs root=/dev/ram0 ramdisk_size=1500000 ip=dhcp
 boot || goto custom_exit
 
 :custom_exit
