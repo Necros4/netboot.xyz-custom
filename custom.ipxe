@@ -5,7 +5,7 @@
 
 :option_two
 kernel https://boot.netboot.xyz/memdisk 
-initrd https://releases.ubuntu.com/20.04.1/ubuntu-20.04.1-desktop-amd64.iso
+initrd http://cdimage.ubuntu.com/lubuntu/releases/18.04/release/lubuntu-18.04-alternate-amd64.iso
 boot || goto custom_exit
 
 :custom_exit
