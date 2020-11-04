@@ -4,9 +4,8 @@
 ###
 
 :option_two
-set url http://archive.ubuntu.com/ubuntu/dists/focal/main/installer-amd64/current/legacy-images/netboot/ubuntu-installer/amd64/
 kernel https://boot.netboot.xyz/memdisk 
-initrd ${url}initrd.gz
+initrd https://releases.ubuntu.com/20.04.1/ubuntu-20.04.1-desktop-amd64.iso
 boot || goto custom_exit
 
 :custom_exit
