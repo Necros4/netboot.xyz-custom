@@ -7,7 +7,7 @@
 set url http://archive.ubuntu.com/ubuntu/dists/focal/main/installer-amd64/current/legacy-images/netboot/ubuntu-installer/amd64/
 kernel ${url}linux
 initrd ${url}initrd.gz
-imgargs root=/dev/ram0 ramdisk_size=1500000 ip=dhcp url=http://releases.ubuntu.com/focal/ubuntu-20.04.1-live-server-amd64.iso
+#imgargs root=/dev/ram0 ramdisk_size=1500000 ip=dhcp url=http://releases.ubuntu.com/focal/ubuntu-20.04.1-live-server-amd64.iso
 boot || goto custom_exit
 
 :custom_exit
