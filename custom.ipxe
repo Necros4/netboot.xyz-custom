@@ -5,10 +5,10 @@
 imgfree
 set url http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/
 kernel ${url}linux root=/dev/ram0 ramdisk_size=1500000 initrd=initrd ip=dhcp url=https://releases.ubuntu.com/groovy/ubuntu-20.10-live-server-amd64.iso
-initrd ${url}initrd
+initrd ${url}initrd.gz
 echo
 echo MD5sums:
-md5sum vmlinuz initrd
+md5sum linux initrd.gz
 boot || goto custom_exit
 
 :custom_exit
