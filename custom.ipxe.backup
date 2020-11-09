@@ -1,0 +1,12 @@
+#!ipxe
+###
+### netboot.xyz-custom menu
+###
+
+set url http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/
+kernel ${url}pxelinux.0
+initrd ${url}initrd.gz
+boot || goto custom_exit
+
+:custom_exit
+exit 0
