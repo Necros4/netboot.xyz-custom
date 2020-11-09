@@ -1,12 +1,104 @@
 #!ipxe
-###
-### netboot.xyz-custom menu
-###
 
-set url http://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/current/images/netboot/ubuntu-installer/amd64/
-kernel ${url}pxelinux.0
-initrd ${url}initrd.gz
-boot || goto custom_exit
+# Ubuntu Operating System
+# https://www.ubuntu.com
 
-:custom_exit
+goto ${menu}
+
+:ubuntu
+set os Ubuntu
+clear ubuntu_version
+clear install_type
+clear older_release
+set install_type deb
+menu ${os} - ${arch_a}
+item --gap Latest Releases
+{% for item in releases.ubuntu.versions %}
+item {{ item.code_name }} ${space} ${os} {{ item.name }}
+{% endfor %}
+item --gap Older Releases
+item older_release ${space} Set release codename...
+choose ubuntu_version || goto ubuntu_exit
+iseq ${ubuntu_version} older_release && goto older_release ||
+iseq ${ubuntu_version} focal && set install_type sub ||
+iseq ${ubuntu_version} groovy && set install_type sub ||
+iseq ${boot_type} sub && goto boot_type ||
+goto mirrorcfg
+
+:older_release
+set older_release true
+set ubuntu_mirror {{ releases.ubuntu.archive_mirror }}
+echo Setting mirror to ${ubuntu_mirror}
+clear ubuntu_version
+echo -n Please set enter code name of release: ${} && read ubuntu_version
+set dir ${ubuntu_base_dir}/dists/${ubuntu_version}-updates/main/installer-${arch_a}/current/images/netboot/
+goto boot_type
+
+:mirrorcfg
+set mirrorcfg mirror/suite=${ubuntu_version}
+set dir ${ubuntu_base_dir}/dists/${ubuntu_version}-updates/main/installer-${arch_a}/current/images/netboot/
+
+:boot_type
+menu ${os} [${ubuntu_version}] Installer
+item --gap Install types
+item install ${space} Install
+item rescue ${space} Rescue Mode
+item automated ${space} Specify preseed/autoinstall url...
+choose --default ${type} type || goto ubuntu
+echo ${cls}
+goto deb_${type}
+
+:deb_rescue
+iseq ${install_type} deb && set install_params rescue/enable=true ||
+iseq ${install_type} sub && set install_params systemd.unit=rescue.target ||
+goto deb_install
+
+:deb_automated
+echo -n Specify preseed/autoinstall URL for ${os} ${ubuntu_version}: && read autoinstall
+iseq ${install_type} deb && set install_params auto=true priority=critical preseed/url=${autoinstall} ||
+iseq ${install_type} sub && set install_params autoinstall ds=nocloud-net;s=${autoinstall} ||
+goto deb_install
+
+:deb_install
+iseq ${install_type} deb && goto deb_boot ||
+iseq ${install_type} sub && goto ${ubuntu_version} ||
+
+:deb_boot
+echo Loading Ubuntu PXE netboot installer
+set dir ${dir}${menu}-installer/${arch_a}
+imgfree
+kernel ${ubuntu_mirror}/${dir}/linux ${install_params} ${mirrorcfg} -- quiet ${params} initrd=initrd.gz ${cmdline}
+initrd ${ubuntu_mirror}/${dir}/initrd.gz
+echo
+echo MD5sums:
+md5sum linux initrd.gz
+boot
+
+{% for key, value in endpoints.items() | sort %}
+{% if value.os == "ubuntu" and 'netboot' in key %}
+{% set kernel_name = value.kernel %}
+:{{ value.codename }}
+{% for key, value in endpoints.items() | sort %}
+{% if key == kernel_name %}
+set kernel_url ${live_endpoint}{{ value.path }}
+set codename {{ value.codename }}
+set version_number {{ value.version }}
+{% endif %}
+{% endfor %}
+goto sub_boot
+{% endif %}
+{% endfor %}
+
+:sub_boot
+imgfree
+echo Loading Ubuntu Subiquity Network Installer...
+kernel ${kernel_url}vmlinuz root=/dev/ram0 ramdisk_size=1500000 initrd=initrd ip=dhcp url=http://releases.ubuntu.com/${codename}/ubuntu-${version_number}-live-server-${arch_a}.iso
+initrd ${kernel_url}initrd
+echo
+echo MD5sums:
+md5sum vmlinuz initrd
+boot
+
+:ubuntu_exit
+clear menu
 exit 0
